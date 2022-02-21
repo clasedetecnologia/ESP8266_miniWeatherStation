@@ -22,7 +22,7 @@ SSD1306 display(0x3c, 5, 4); //SSD1306 display(0x3c, SDA_PIN, SCK_PIN)
 
 //************** WIFI CONF **************
 const char *ssid     = "CasaBM1";
-const char *password = "hr5-jk@27HJyure76";
+const char *password = "*******************";
 const char* mqtt_server = "192.168.0.19";
 //************** NTP CONF ***************
 const long utcOffsetInSeconds = 3600; //UTC+1
