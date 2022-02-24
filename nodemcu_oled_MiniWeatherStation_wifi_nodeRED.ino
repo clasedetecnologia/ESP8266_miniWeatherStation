@@ -22,10 +22,10 @@ SSD1306 display(0x3c, 5, 4); //SSD1306 display(0x3c, SDA_PIN, SCK_PIN)
 
 //************** WIFI CONF **************
 const char *ssid     = "CasaBM1";
-const char *password = "*******************";
+const char *password = "******************";
 const char* mqtt_server = "192.168.0.19";
 //************** NTP CONF ***************
-const long utcOffsetInSeconds = 3600; //UTC+1
+const long utcOffsetInSeconds = 3600;
 char daysOfTheWeek[7][12] = {"Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"};
 // Define NTP Client to get time
 WiFiUDP ntpUDP;
@@ -76,23 +76,34 @@ void setup() {
   
   /* Mostramos la pantalla de bienvenida */
   display.clear();
-  display.init();
+    display.init();
   display.setContrast(255);
-  display.setFont(ArialMT_Plain_16);
-  display.drawString(15, 25, "¡¡Hola, Pedro!! ");
+  display.setFont(ArialMT_Plain_10);
+  display.drawString(15, 25, "Iniciando...");
   display.display();
   
   Serial.begin(115200);
   WiFi.begin(ssid, password);
+  display.clear();
   while ( WiFi.status() != WL_CONNECTED ) {
     delay ( 500 );
     Serial.print ( "." );
+    
+    display.drawString(10, 15, "Conectando WiFi... ");
+    display.display();
   }
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+  display.clear();
+  display.drawString(3,15,"Conectado a: "+ String(ssid));
+  display.display();
+  
   timeClient.begin();
   dht.begin();
 
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
+  delay(1500);
 }
 //*********************************************
 void loop() {
@@ -106,7 +117,7 @@ void loop() {
   display.drawLine(0,0,DISPLAY_WIDTH,0);
   display.drawRect(0,15,DISPLAY_WIDTH, DISPLAY_HEIGHT-16);
   display.setFont(ArialMT_Plain_10);
-  display.drawString(0,2,"Proto1:MiniWeather Station");
+  display.drawString(0,2,"EstaciónMeteo1 |" +String(ssid));
   display.drawString(3,15,"Temperatura: "+ String(t) + "º");
   display.drawString(3,30,"Humedad: " + String(h) + "%");
   display.drawString(3,50,"Última lectura: " + timeClient.getFormattedTime());
@@ -123,8 +134,9 @@ void loop() {
     Serial.print("Publico temperatura a : ");
     Serial.print(String(timeClient.getFormattedTime()));
     Serial.println(t);
-    client.publish("casa/salon/temperatura", String(t).c_str(), true);
-    client.publish("casa/salon/humedad", String(h).c_str(),true);
+    client.publish("casa/patio/temperatura", String(t).c_str(), true);
+    client.publish("casa/patio/humedad", String(h).c_str(),true);
   }
 
 }
+
